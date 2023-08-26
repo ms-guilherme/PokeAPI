@@ -1,0 +1,74 @@
+ <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="pokebola.ico" type="image/x-icon"> <!--Arte feita por Darius Dan, em flaticon.com (https://www.flaticon.com/br/icones-gratis/pokebola)-->
+    <link rel="stylesheet" href="style.css">
+    <title>PokeAPI</title>
+</head>
+<body>
+    
+    <div id="title">
+        <h2>PokéAPI</h2>
+    </div>
+    <br>
+
+    <input type="text" id="poke-quant" placeholder="Quantidade" style="width: 25%; height: 40px; text-align: center; display: block; margin: 0 auto; background-color: #ffd445; border-color: #7f83cc50; font: 20px Comic Sans MS; box-shadow: 2px 2px 5px #ffffff73; border-radius: 10px;">
+    <br>
+
+    <div id="align-poke">
+        <div class="poke-boxs"></div>
+    </div>
+
+    <script> /*Ideias pós-conclusão; 
+    *Cards clicáveis: Fazer das divs de pokemon cards clicáveis que terão uma animação de se virar, mostrando o lado de trás do card com informações adicionais do respectivo pokemon;
+    *Filtragem: Opção de se buscar pokemons com base em filtros, como o tipo, letra, região, etc;
+    *Rodapé com informações próprias divulgacionais, e uma breve explicação de o que é 'pokemon';
+    */
+        Selection(151); //Primeiro load da página, com a quantidade padrão;
+
+        var QuantidadePoke = document.getElementById("poke-quant");
+        QuantidadePoke.addEventListener("keyup", ()=> {Selection(QuantidadePoke.value)});
+
+        function Selection(quant) {
+            
+            fetch("https://pokeapi.co/api/v2/pokemon?limit="+quant)
+            .then(response => response.json())
+            .then(allPokemon => {
+
+                var pokemons = [];
+
+                allPokemon.results.map( (val)=> {
+                    
+                    fetch(val.url) //Por conta do .map, esta função será como um loop, trabalhando com um pokemon por vez. A cada loop, será pego a "url" do pokemon em trabalho;
+                    .then(response => response.json())
+                    .then(singlePokemon => {
+                        pokemons.push({nome:val.name, imagem: singlePokemon.sprites.front_default});
+
+                        if (pokemons.length == quant) {
+                            /*Requisições finalizadas*/
+
+                            console.log(pokemons);
+                            var poke_boxs = document.querySelector('.poke-boxs');
+                            poke_boxs.innerHTML = "";
+
+                            pokemons.map( (val)=> {
+                                poke_boxs.innerHTML += `
+                                <div class="poke-box">
+                                    <img src="`+val.imagem+`" alt="">
+                                    <p>`+val.nome+`</p>
+                                </div>`;
+                            })
+                        }
+                    } )
+
+                } )
+
+            })
+        }
+
+    </script>
+</body>
+</html>
